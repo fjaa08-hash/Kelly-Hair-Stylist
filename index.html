@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kelly Hair Stylist</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FAF6EA">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kelly">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --brand:#8A6420;      /* dorado oscuro: textos de acento */
+    --ink:#2A2622;        /* carbón del logo */
+    --gold:#C9A24D;
+    --gold-light:#E9D08D;
+    --cream:#F8F4EA;
+    --card:#FFFFFF;
+    --line:#EADFC6;
+    --tint:#F6EFDC;       /* champagne para cajas */
+    --ok:#3E8F5C;
+    --warn:#C77D1E;
+    --danger:#C6425E;
+    --muted:#7C7466;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--cream);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* Header */
+  .hdr{
+    padding:20px 20px 18px;
+    background:linear-gradient(160deg, #FFFDF8 0%, #FAF5E6 60%, #F3EACF 100%);
+    color:var(--ink);
+    border-radius:0 0 28px 28px;
+    border-bottom:3px solid var(--gold);
+    box-shadow:0 8px 22px rgba(138,100,32,.14);
+    position:relative;
+    overflow:hidden;
+  }
+  .hdr::after{
+    content:"";
+    position:absolute;
+    right:-50px; top:-60px;
+    width:170px; height:170px;
+    border-radius:50%;
+    background:var(--gold-light);
+    opacity:.35;
+  }
+  .hdr::before{
+    content:"";
+    position:absolute;
+    right:40px; bottom:-70px;
+    width:100px; height:100px;
+    border-radius:50%;
+    background:var(--gold);
+    opacity:.16;
+  }
+  .hdr-top{display:flex; align-items:center; gap:14px; position:relative; z-index:1;}
+  .brand-logo{height:104px; width:auto; display:block; flex-shrink:0;}
+  .hdr-side{flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:10px;}
+  .hdr-sub{font-size:13px; color:var(--muted); line-height:1.4;}
+  .stats-row{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    position:relative; z-index:1;
+  }
+  .stat{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:10px 12px;
+  }
+  .stat b{display:block; font-family:'Sora',sans-serif; font-size:20px; font-weight:700; color:var(--ink);}
+  .stat span{font-size:11.5px; color:var(--muted);}
+
+  /* Tabs */
+  .tabs{
+    display:flex;
+    margin:16px 16px 0;
+    background:#fff;
+    border-radius:14px;
+    padding:4px;
+    box-shadow:0 2px 10px rgba(42,38,34,.07);
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{
+    flex:0 0 auto;
+    white-space:nowrap;
+    text-align:center;
+    padding:9px 14px;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--muted);
+    border-radius:11px;
+    cursor:pointer;
+    user-select:none;
+    transition:background .15s, color .15s;
+  }
+  .tab.active{
+    background:linear-gradient(120deg, var(--gold-light), var(--gold));
+    color:var(--ink);
+  }
+
+  .view{padding:16px; flex:1; display:none;}
+  .view.active{display:block;}
+
+  /* Search */
+  .search{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:14px;
+  }
+  .search input{
+    border:none; outline:none; flex:1;
+    font-family:'Inter',sans-serif; font-size:14px;
+    background:transparent; color:var(--ink);
+  }
+  .search svg{flex-shrink:0;}
+
+  /* Client card */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .client-row{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .client-name{font-weight:700; font-size:15px;}
+  .client-phone{font-size:12.5px; color:var(--muted); margin-top:2px;}
+  .visits-pill{
+    font-size:11px; font-weight:600; color:var(--brand);
+    background:var(--tint); padding:3px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .client-actions{display:flex; gap:8px; margin-top:12px;}
+  .btn-mini{
+    flex:1;
+    text-align:center;
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px 6px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--brand);
+    cursor:pointer;
+    text-decoration:none;
+    display:flex; align-items:center; justify-content:center; gap:5px;
+  }
+  .btn-mini.wa{ background:#EAF7EE; border-color:#CFEBD8; color:var(--ok); }
+  .balance-tag{
+    margin-top:10px;
+    font-size:12px;
+    font-weight:600;
+    padding:6px 10px;
+    border-radius:10px;
+    display:inline-block;
+  }
+  .balance-tag.pend{ background:#FCEFDD; color:var(--warn); }
+
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    padding:40px 16px;
+    font-size:13.5px;
+    line-height:1.5;
+  }
+  .empty b{display:block; color:var(--ink); font-size:15px; margin-bottom:6px; font-family:'Sora',sans-serif;}
+
+  /* FAB */
+  .fab{
+    position:fixed;
+    left:50%;
+    transform:translateX(calc(-50% + 190px));
+    bottom:22px;
+    width:56px; height:56px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--gold-light), var(--gold));
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 20px rgba(138,100,32,.4);
+    cursor:pointer;
+    border:none;
+    z-index:20;
+  }
+  @media (max-width:480px){
+    .fab{ transform:none; right:24px; left:auto; }
+  }
+
+  /* Form */
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block; font-size:12.5px; font-weight:600; color:var(--ink);
+    margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;
+    padding:11px 12px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .row2{display:flex; gap:10px;}
+  .row2 .field{flex:1;}
+  .helper{font-size:11.5px; color:var(--muted); margin-top:4px;}
+  .remaining-box{
+    background:var(--tint);
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:16px;
+  }
+  .remaining-box b{ font-family:'Sora',sans-serif; font-size:19px; color:var(--brand); }
+  .total-box{ background:#F5E8C3; }
+  .total-box b{ color:var(--brand); }
+
+  .item-row{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:8px;
+  }
+  .item-row-main{ display:flex; gap:6px; align-items:center; }
+  .item-row-main select{
+    flex:1.6; padding:9px 6px; border-radius:9px; border:1px solid var(--line);
+    font-family:'Inter',sans-serif; font-size:12.5px; background:#fff; color:var(--ink); min-width:0;
+  }
+  .item-row-main .item-qty{
+    flex:0 0 40px; padding:9px 4px; border-radius:9px; border:1px solid var(--line);
+    font-family:'Inter',sans-serif; font-size:13px; text-align:center; min-width:0;
+  }
+  .item-row-main .item-price{
+    flex:0.75; padding:9px 6px; border-radius:9px; border:1px solid var(--line);
+    font-family:'Inter',sans-serif; font-size:13px; min-width:0;
+  }
+  .item-row-sub{ display:flex; justify-content:space-between; margin-top:4px; padding:0 2px;}
+  .item-row-sub span{ font-size:10.5px; color:var(--muted); }
+  .item-remove{
+    flex-shrink:0; width:28px; height:28px; border-radius:50%;
+    background:#FBE7EC; color:var(--danger); border:none; cursor:pointer; font-size:13px;
+  }
+  .item-service-custom{
+    width:100%; margin-top:8px; padding:9px 10px; border-radius:9px;
+    border:1px solid var(--line); font-family:'Inter',sans-serif; font-size:13px;
+  }
+
+  .btn-main{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    background:linear-gradient(120deg, #2A2622, #443E38);
+    color:#F3DA9A;
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  .btn-main.secondary{ background:#fff; color:var(--brand); border:1.5px solid var(--brand); margin-top:8px; }
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(42,38,34,.5);
+    display:none; align-items:flex-end; justify-content:center; z-index:30;
+  }
+  .overlay.show{display:flex;}
+  .sheet{
+    background:#fff;
+    width:100%; max-width:480px;
+    border-radius:22px 22px 0 0;
+    padding:20px 20px 26px;
+    max-height:86vh;
+    overflow-y:auto;
+    animation:up .18s ease-out;
+  }
+  @keyframes up{ from{transform:translateY(24px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+  .sheet-hdr{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  .sheet-title{font-family:'Sora',sans-serif; font-weight:700; font-size:17px;}
+  .close-x{ background:var(--tint); border:none; width:30px; height:30px; border-radius:50%; color:var(--brand); font-size:16px; cursor:pointer; }
+
+  /* Reminders list */
+  .rem-item{
+    background:var(--card);
+    border-radius:16px;
+    border:1px solid var(--line);
+    padding:14px 16px;
+    margin-bottom:10px;
+    border-left:4px solid var(--warn);
+  }
+  .rem-item.overdue{ border-left-color:var(--danger); }
+  .rem-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .rem-name{font-weight:700; font-size:14.5px;}
+  .rem-service{font-size:12.5px; color:var(--muted); margin-top:2px;}
+  .rem-amount{font-family:'Sora',sans-serif; font-weight:700; font-size:16px; color:var(--brand);}
+  .rem-date{font-size:11.5px; margin-top:8px; font-weight:600;}
+  .rem-date.overdue{ color:var(--danger); }
+  .rem-date.soon{ color:var(--warn); }
+  .rem-actions{display:flex; gap:8px; margin-top:10px;}
+
+  .section-title{
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    margin:4px 0 12px;
+    color:var(--ink);
+  }
+  .toast{
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:30px;
+    font-size:13px; z-index:50; opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .toast.show{opacity:1;}
+
+  /* Ledger (Registro diario) */
+  .ledger-stats{display:flex; gap:10px; margin-bottom:16px;}
+  .ledger-stat{
+    flex:1; background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:12px; text-align:center;
+  }
+  .ledger-stat b{ display:block; font-family:'Sora',sans-serif; font-size:18px; color:var(--brand); }
+  .ledger-stat span{ font-size:11px; color:var(--muted); }
+  .ledger-item{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:12px 14px; margin-bottom:9px; display:flex; justify-content:space-between; gap:10px;
+  }
+  .ledger-left{min-width:0;}
+  .ledger-date{font-size:11px; color:var(--muted); font-weight:600;}
+  .ledger-name{font-weight:700; font-size:14px; margin-top:2px;}
+  .ledger-service{font-size:12px; color:var(--muted); margin-top:1px;}
+  .ledger-right{text-align:right; flex-shrink:0;}
+  .ledger-total{font-family:'Sora',sans-serif; font-weight:700; font-size:15px; color:var(--brand);}
+  .ledger-sub{font-size:10.5px; color:var(--muted); margin-top:2px;}
+  .icon-btn{
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    padding:4px; margin-top:6px;
+  }
+
+  /* Ajustes / settings */
+  .settings-block{
+    background:#fff; border:1px solid var(--line); border-radius:16px;
+    padding:16px; margin-bottom:16px;
+  }
+  .settings-block h3{
+    font-family:'Sora',sans-serif; font-size:14.5px; margin:0 0 4px;
+  }
+  .settings-block p{ font-size:12px; color:var(--muted); margin:0 0 14px; line-height:1.4; }
+  .service-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--line);
+  }
+  .service-item:last-of-type{ border-bottom:none; }
+  .service-name{font-weight:600; font-size:13.5px;}
+  .service-price{font-size:12.5px; color:var(--muted);}
+  .stock-badge{
+    display:inline-block; margin-left:8px; font-size:10.5px; font-weight:700;
+    padding:2px 8px; border-radius:10px; background:#EAF7EE; color:var(--ok);
+  }
+  .stock-badge.low{ background:#FCEFDD; color:var(--warn); }
+  .stock-badge.out{ background:#FBE7EC; color:var(--danger); }
+  .service-actions{display:flex; gap:10px; align-items:center;}
+  .service-actions button{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; }
+  .file-btn{
+    display:block; text-align:center; width:100%; padding:12px; border-radius:12px;
+    border:1.5px dashed var(--line); color:var(--brand); font-weight:600; font-size:13px;
+    cursor:pointer; background:#FFFDF7; margin-top:10px;
+  }
+  .ledger-icons{display:flex; gap:6px; justify-content:flex-end; margin-top:6px;}
+
+  .install-btn{
+    background:rgba(42,38,34,.05);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-size:11.5px;
+    font-weight:600;
+    padding:6px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    gap:5px;
+  }
+
+  /* Elegir contactos */
+  .or-divider{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:11.5px; margin:14px 0; }
+  .or-divider::before, .or-divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-top">
+      <img class="brand-logo" src="logo.png" alt="Kelly Hair Stylist">
+      <div class="hdr-side">
+        <button class="install-btn" id="installBtn">📲 Instalar app</button>
+        <div class="hdr-sub">Clientas, anticipos y recordatorios <span id="syncBadge" style="display:none; margin-left:6px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; vertical-align:middle;"></span></div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><b id="statClients">0</b><span>Clientas</span></div>
+      <div class="stat"><b id="statPending">0</b><span>Pagos pendientes</span></div>
+      <div class="stat"><b id="statOwed">€0</b><span>Por cobrar</span></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="clientes">Clientas</div>
+    <div class="tab" data-tab="pago">Pago</div>
+    <div class="tab" data-tab="registro">Registro</div>
+    <div class="tab" data-tab="tienda">Tienda</div>
+    <div class="tab" data-tab="recordatorios">Recordatorios</div>
+    <div class="tab" data-tab="ajustes">Ajustes</div>
+  </div>
+
+  <!-- CLIENTES -->
+  <div class="view active" id="view-clientes">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C7466" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchClients" placeholder="Buscar por nombre o teléfono">
+    </div>
+    <div id="clientList"></div>
+  </div>
+
+  <!-- REGISTRAR PAGO -->
+  <div class="view" id="view-pago">
+    <div class="field">
+      <label>Clienta</label>
+      <select id="payClientSelect">
+        <option value="">Selecciona una clienta...</option>
+      </select>
+      <div class="helper">¿Es nueva? Ve a la pestaña Clientas y agrégala primero, o usa "+ Nueva clienta" abajo.</div>
+    </div>
+    <button class="btn-main secondary" id="quickAddBtn" type="button">+ Nueva clienta rápida</button>
+
+    <div style="height:16px"></div>
+
+    <div class="field">
+      <label>Servicios o productos</label>
+      <div id="itemsContainer"></div>
+      <button type="button" class="btn-main secondary" id="addItemBtn" style="margin-top:4px;">+ Agregar otra línea</button>
+    </div>
+
+    <div class="remaining-box total-box">
+      <span>Total de la venta</span>
+      <b id="totalPreview">€0</b>
+    </div>
+    <div class="field">
+      <label>Anticipo recibido</label>
+      <input id="payAdvance" type="number" inputmode="decimal" placeholder="0">
+    </div>
+    <div class="remaining-box">
+      <span>Resta por cobrar</span>
+      <b id="remainingPreview">€0</b>
+    </div>
+    <div class="field">
+      <label>Fecha y hora del servicio o cita</label>
+      <input id="payServiceDate" type="datetime-local">
+    </div>
+    <div class="field">
+      <label>Recordarme cobrar el ______</label>
+      <input id="payReminderDate" type="date">
+      <div class="helper">Si no queda nada pendiente, este campo no hace falta.</div>
+    </div>
+    <button class="btn-main" id="savePayBtn">Guardar</button>
+  </div>
+
+  <!-- RECORDATORIOS -->
+  <div class="view" id="view-recordatorios">
+    <div id="remindersList"></div>
+  </div>
+
+  <!-- REGISTRO DIARIO (LIBRO DE CONTABILIDAD) -->
+  <div class="view" id="view-registro">
+    <div class="ledger-stats">
+      <div class="ledger-stat"><b id="ledgerToday">€0</b><span>Hoy</span></div>
+      <div class="ledger-stat"><b id="ledgerMonth">€0</b><span>Este mes</span></div>
+      <div class="ledger-stat"><b id="ledgerCount">0</b><span>Movimientos</span></div>
+    </div>
+    <button class="btn-main secondary" id="downloadExcelBtn" style="margin-bottom:14px;">Descargar registro en Excel</button>
+    <div id="ledgerList"></div>
+  </div>
+
+  <!-- TIENDA: PRODUCTOS E INVENTARIO -->
+  <div class="view" id="view-tienda">
+    <div class="ledger-stats">
+      <div class="ledger-stat"><b id="storeProductCount">0</b><span>Productos</span></div>
+      <div class="ledger-stat"><b id="storeStockValue">€0</b><span>Valor en stock</span></div>
+      <div class="ledger-stat"><b id="storeLowStock">0</b><span>Con poco stock</span></div>
+    </div>
+    <div class="settings-block">
+      <h3>Inventario de productos</h3>
+      <p>Agrega los productos que vendes en tienda, con su precio y cuántas unidades tienes. Al vender uno en "Pago", el inventario baja solo.</p>
+      <div id="productList"></div>
+      <div class="row2" style="margin-top:10px;">
+        <div class="field" style="margin-bottom:0;">
+          <input id="newProductName" placeholder="Nombre del producto">
+        </div>
+        <div class="field" style="margin-bottom:0; max-width:90px;">
+          <input id="newProductPrice" type="number" inputmode="decimal" placeholder="Precio">
+        </div>
+        <div class="field" style="margin-bottom:0; max-width:80px;">
+          <input id="newProductStock" type="number" inputmode="numeric" placeholder="Stock">
+        </div>
+      </div>
+      <button class="btn-main secondary" id="addProductBtn" style="margin-top:10px;">+ Agregar producto</button>
+    </div>
+  </div>
+
+  <!-- AJUSTES: SERVICIOS + RESPALDO -->
+  <div class="view" id="view-ajustes">
+    <div class="settings-block">
+      <h3>Servicios y precios</h3>
+      <p>Agrega aquí tu lista de servicios para elegirlos rápido al registrar un pago.</p>
+      <div id="serviceList"></div>
+      <div class="row2" style="margin-top:10px;">
+        <div class="field" style="margin-bottom:0;">
+          <input id="newServiceName" placeholder="Nombre del servicio">
+        </div>
+        <div class="field" style="margin-bottom:0; max-width:110px;">
+          <input id="newServicePrice" type="number" inputmode="decimal" placeholder="Precio">
+        </div>
+      </div>
+      <button class="btn-main secondary" id="addServiceBtn" style="margin-top:10px;">+ Agregar servicio</button>
+    </div>
+
+    <div class="settings-block">
+      <h3>Copia de seguridad</h3>
+      <p>Descarga un archivo con todas tus clientas, servicios, productos y pagos. Guárdalo en un lugar seguro (Drive, correo) por si cambias de celular.</p>
+      <button class="btn-main" id="downloadBackupBtn">Descargar copia de seguridad</button>
+      <label class="file-btn" for="restoreFileInput">Restaurar desde un archivo de respaldo</label>
+      <input type="file" id="restoreFileInput" accept="application/json" style="display:none;">
+    </div>
+  </div>
+
+  <button class="fab" id="fabAdd" title="Nueva clienta">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A2622" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <div class="sheet-title" id="sheetTitle">Nueva clienta</div>
+      <button class="close-x" id="sheetClose">✕</button>
+    </div>
+    <div id="sheetBody">
+      <div id="pickBlock">
+        <button type="button" class="btn-main secondary" id="pickContactsBtn" style="margin-top:0; display:none;">📇 Elegir de mis contactos</button>
+        <label class="file-btn" id="vcfImportLabel" for="vcfInput" style="margin-top:0; display:none;">📇 Importar contactos (archivo .vcf)</label>
+        <input type="file" id="vcfInput" accept=".vcf,text/vcard,text/x-vcard" multiple style="display:none;">
+        <div class="or-divider">o escríbela manualmente</div>
+      </div>
+      <div class="field">
+        <label>Nombre</label>
+        <input id="newName" placeholder="Nombre de la clienta">
+      </div>
+      <div class="field">
+        <label>Teléfono (WhatsApp)</label>
+        <input id="newPhone" placeholder="Ej: 0412-1234567">
+      </div>
+      <button class="btn-main" id="saveClientBtn">Guardar clienta</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="invoiceOverlay">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <div class="sheet-title">Factura</div>
+      <button class="close-x" id="invoiceClose">✕</button>
+    </div>
+    <div style="text-align:center;">
+      <canvas id="invoiceCanvas" width="720" height="1040" style="width:100%; max-width:320px; border-radius:14px; box-shadow:0 4px 18px rgba(42,38,34,.18);"></canvas>
+    </div>
+    <button class="btn-main" id="invoiceShareBtn" style="margin-top:16px;">📤 Enviar imagen por WhatsApp</button>
+    <button class="btn-main secondary" id="invoiceDownloadBtn">Descargar factura</button>
+    <a class="btn-main secondary" id="invoiceWaLink" style="display:block; text-align:center; text-decoration:none;" target="_blank" rel="noopener">Abrir chat con el texto de la factura</a>
+    <button class="btn-main secondary" id="invoiceCopyPayBtn">📋 Copiar datos de Pago Móvil</button>
+    <p class="helper" style="text-align:center; margin-top:10px;">"Enviar imagen" abre el menú para compartir de tu celular con la factura ya adjunta — solo elige WhatsApp y el contacto. Si tu navegador no lo permite, descárgala y adjúntala manualmente.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import {
+  getAuth, signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+// ============================================================
+// SINCRONIZACIÓN EN TIEMPO REAL (Firebase) — CONFIGURA AQUÍ
+// ------------------------------------------------------------
+// 1. Crea un proyecto gratis en https://console.firebase.google.com
+// 2. Activa "Firestore Database" (modo producción) y "Authentication"
+//    → método "Anónimo".
+// 3. En Configuración del proyecto → tus apps → app web, copia el
+//    objeto de configuración y pégalo reemplazando el de abajo.
+// Si dejas los valores de ejemplo tal cual, la app funciona normal
+// pero SOLO en este celular, sin sincronizar con otros.
+// ============================================================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCtG6vH1LXlpg2L-0vXxcGkmhAK3sELW0o",
+  authDomain: "salon-rosel.firebaseapp.com",
+  projectId: "salon-rosel",
+  storageBucket: "salon-rosel.firebasestorage.app",
+  messagingSenderId: "480933905619",
+  appId: "1:480933905619:web:4538df63988d4456448026"
+};
+const SYNC_ENABLED = FIREBASE_CONFIG.apiKey !== "TU_API_KEY";
+const SALON_DOC = ['salones', 'kelly']; // colección/documento compartido (propio de Kelly)
+
+let cloudDb = null;
+let cloudReady = false;
+let applyingRemoteUpdate = false;
+let pendingLocalPush = false;
+
+(function(){
+  // Si la app se abre fuera del entorno de Claude (por ejemplo, publicada en
+  // GitHub Pages), window.storage no existe. Usamos localStorage del navegador
+  // como respaldo automático, con la misma forma de respuesta para no tocar
+  // el resto del código.
+  if (!window.storage){
+    // Prefijo propio: si otra app está publicada en el mismo dominio de GitHub Pages,
+    // sus datos guardados no se mezclan con los de Kelly.
+    const P = 'kelly_';
+    window.storage = {
+      async get(key){
+        try{
+          const v = localStorage.getItem(P + key);
+          return v === null ? null : { key, value: v };
+        }catch(e){ return null; }
+      },
+      async set(key, value){
+        try{
+          localStorage.setItem(P + key, value);
+          return { key, value };
+        }catch(e){ return null; }
+      },
+      async delete(key){
+        try{ localStorage.removeItem(P + key); return { key, deleted: true }; }
+        catch(e){ return null; }
+      },
+      async list(prefix){
+        try{
+          const keys = Object.keys(localStorage)
+            .filter(k => k.startsWith(P) && (!prefix || k.slice(P.length).startsWith(prefix)))
+            .map(k => k.slice(P.length));
+          return { keys, prefix };
+        }catch(e){ return null; }
+      }
+    };
+  }
+
+  let clients = [];
+  let payments = [];
+  let services = [];
+  let products = [];
+  let editingClientId = null;
+  let quickAddFromPay = false;
+
+  const $ = (id) => document.getElementById(id);
+  const contactPickerSupported = !!(navigator.contacts && navigator.contacts.select && 'ContactsManager' in window);
+
+  function updateSyncBadge(state){
+    // state: 'off' | 'connecting' | 'on' | 'error'
+    const el = $('syncBadge');
+    if (!el) return;
+    if (state === 'on'){
+      el.textContent = '☁ Sincronizado';
+      el.style.display = 'inline-block';
+      el.style.background = 'rgba(62,143,92,.25)';
+    } else if (state === 'connecting'){
+      el.textContent = '☁ Conectando...';
+      el.style.display = 'inline-block';
+      el.style.background = 'rgba(42,38,34,.08)';
+    } else if (state === 'error'){
+      el.textContent = '⚠ Sin conexión a la nube';
+      el.style.display = 'inline-block';
+      el.style.background = 'rgba(198,66,94,.35)';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  async function pushToCloud(){
+    if (!SYNC_ENABLED || !cloudReady || applyingRemoteUpdate){
+      pendingLocalPush = !cloudReady && SYNC_ENABLED;
+      return;
+    }
+    try{
+      const ref = doc(cloudDb, ...SALON_DOC);
+      await setDoc(ref, {
+        clients, payments, services, products,
+        updatedAt: new Date().toISOString()
+      });
+    }catch(e){
+      console.error('No se pudo sincronizar con la nube', e);
+      updateSyncBadge('error');
+    }
+  }
+
+  async function initCloudSync(){
+    if (!SYNC_ENABLED) { updateSyncBadge('off'); return; }
+    updateSyncBadge('connecting');
+    try{
+      const app = initializeApp(FIREBASE_CONFIG);
+      const auth = getAuth(app);
+      await signInAnonymously(auth);
+      cloudDb = getFirestore(app);
+      const ref = doc(cloudDb, ...SALON_DOC);
+      onSnapshot(ref, (snap) => {
+        cloudReady = true;
+        updateSyncBadge('on');
+        if (!snap.exists()){
+          // Primera vez: sube lo que ya haya en este celular.
+          pushToCloud();
+          return;
+        }
+        const data = snap.data();
+        applyingRemoteUpdate = true;
+        clients = data.clients || [];
+        payments = data.payments || [];
+        services = data.services || [];
+        products = data.products || [];
+        render();
+        applyingRemoteUpdate = false;
+        if (pendingLocalPush){ pendingLocalPush = false; pushToCloud(); }
+      }, (err) => {
+        console.error('Error de sincronización', err);
+        updateSyncBadge('error');
+      });
+    }catch(e){
+      console.error('No se pudo iniciar la sincronización', e);
+      updateSyncBadge('error');
+    }
+  }
+
+  function showToast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1800);
+  }
+
+  function fmtMoney(n){
+    n = Number(n) || 0;
+    return '€' + n.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+
+  function catalogOptionsHTML(selectedValue){
+    let html = '<option value="">Selecciona...</option>';
+    if (services.length){
+      html += '<optgroup label="Servicios">' +
+        services.slice().sort((a,b)=>a.name.localeCompare(b.name))
+          .map(s => `<option value="s:${s.id}" data-price="${s.price}" ${('s:'+s.id)===selectedValue?'selected':''}>${s.name} — ${fmtMoney(s.price)}</option>`).join('') +
+        '</optgroup>';
+    }
+    if (products.length){
+      html += '<optgroup label="Productos (tienda)">' +
+        products.slice().sort((a,b)=>a.name.localeCompare(b.name))
+          .map(p => `<option value="p:${p.id}" data-price="${p.price}" ${('p:'+p.id)===selectedValue?'selected':''}>${p.name} — ${fmtMoney(p.price)} (${p.stock} en stock)</option>`).join('') +
+        '</optgroup>';
+    }
+    html += `<option value="__custom__" ${selectedValue==='__custom__'?'selected':''}>Otro (escribir)</option>`;
+    return html;
+  }
+
+  function addItemRow(prefill){
+    const container = $('itemsContainer');
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    const selVal = prefill ? prefill.value : undefined;
+    div.innerHTML = `
+      <div class="item-row-main">
+        <select class="item-catalog">${catalogOptionsHTML(selVal)}</select>
+        <input class="item-qty" type="number" inputmode="numeric" min="1" value="${prefill && prefill.qty ? prefill.qty : 1}" title="Cantidad">
+        <input class="item-price" type="number" inputmode="decimal" placeholder="Precio unit." value="${prefill && prefill.price != null ? prefill.price : ''}">
+        <button type="button" class="item-remove" title="Quitar">✕</button>
+      </div>
+      <input class="item-service-custom" placeholder="Nombre del servicio o producto" style="display:${selVal==='__custom__' ? 'block':'none'};" value="${prefill && prefill.customName ? prefill.customName : ''}">
+      <div class="item-row-sub"><span class="item-subtotal">Subtotal: €0</span></div>
+    `;
+    container.appendChild(div);
+
+    const sel = div.querySelector('.item-catalog');
+    const customInput = div.querySelector('.item-service-custom');
+    const priceInput = div.querySelector('.item-price');
+    const qtyInput = div.querySelector('.item-qty');
+    const subtotalEl = div.querySelector('.item-subtotal');
+
+    function refreshSubtotal(){
+      const price = parseFloat(priceInput.value) || 0;
+      const qty = parseFloat(qtyInput.value) || 0;
+      subtotalEl.textContent = 'Subtotal: ' + fmtMoney(price * qty);
+    }
+
+    sel.addEventListener('change', () => {
+      if (sel.value === '__custom__'){
+        customInput.style.display = 'block';
+        customInput.focus();
+      } else {
+        customInput.style.display = 'none';
+        const opt = sel.options[sel.selectedIndex];
+        const price = opt ? opt.dataset.price : null;
+        if (price){ priceInput.value = price; }
+      }
+      refreshSubtotal();
+      updateItemsTotal();
+    });
+    priceInput.addEventListener('input', () => { refreshSubtotal(); updateItemsTotal(); });
+    qtyInput.addEventListener('input', () => { refreshSubtotal(); updateItemsTotal(); });
+    div.querySelector('.item-remove').addEventListener('click', () => {
+      div.remove();
+      updateItemsTotal();
+    });
+
+    refreshSubtotal();
+    return div;
+  }
+
+  function ensureAtLeastOneRow(){
+    if ($('itemsContainer').children.length === 0){
+      addItemRow();
+    }
+  }
+
+  function collectItems(){
+    const rows = document.querySelectorAll('#itemsContainer .item-row');
+    const items = [];
+    rows.forEach(row => {
+      const sel = row.querySelector('.item-catalog');
+      const customInput = row.querySelector('.item-service-custom');
+      const priceInput = row.querySelector('.item-price');
+      const qtyInput = row.querySelector('.item-qty');
+      let name = '';
+      let type = 'custom';
+      let refId = null;
+      if (sel.value === '__custom__'){
+        name = customInput.value.trim();
+        type = 'custom';
+      } else if (sel.value && sel.value.startsWith('s:')){
+        const id = sel.value.slice(2);
+        const svc = services.find(s => s.id === id);
+        name = svc ? svc.name : '';
+        type = 'service';
+        refId = id;
+      } else if (sel.value && sel.value.startsWith('p:')){
+        const id = sel.value.slice(2);
+        const prod = products.find(p => p.id === id);
+        name = prod ? prod.name : '';
+        type = 'product';
+        refId = id;
+      }
+      const price = parseFloat(priceInput.value) || 0;
+      const qty = Math.max(parseInt(qtyInput.value, 10) || 1, 1);
+      if (name && price > 0){
+        items.push({ name, price, qty, type, refId });
+      }
+    });
+    return items;
+  }
+
+  function computeItemsTotal(){
+    return collectItems().reduce((s,i)=>s + i.price * i.qty, 0);
+  }
+
+  function updateItemsTotal(){
+    const total = computeItemsTotal();
+    $('totalPreview').textContent = fmtMoney(total);
+    updateRemainingPreview();
+  }
+
+  function paymentItems(p){
+    if (p.items && p.items.length) return p.items;
+    if (p.service) return [{ name: p.service, price: p.total, qty: 1, type: 'custom' }];
+    return [];
+  }
+  function itemLabel(i){
+    return i.qty && i.qty > 1 ? `${i.name} x${i.qty}` : i.name;
+  }
+  function paymentServiceSummary(p){
+    return paymentItems(p).map(itemLabel).join(', ') || 'Servicio';
+  }
+
+  async function applyStockChanges(items, direction){
+    // direction: -1 al vender (resta stock), +1 al eliminar una venta (devuelve stock)
+    let changed = false;
+    items.forEach(i => {
+      if (i.type === 'product' && i.refId){
+        const prod = products.find(p => p.id === i.refId);
+        if (prod){
+          prod.stock = Math.max(prod.stock + direction * i.qty, 0);
+          changed = true;
+        }
+      }
+    });
+    if (changed) await saveProducts();
+  }
+
+  function waLink(phone, text){
+    const raw = (phone || '').trim();
+    let digits = raw.replace(/\D/g, '');
+    if (raw.startsWith('+')){
+      // número internacional (como vienen en los contactos): se respeta tal cual
+    } else if (raw.startsWith('00')){
+      digits = digits.slice(2);
+    } else if (digits.startsWith('0')){
+      digits = '58' + digits.slice(1);
+    } else if (!digits.startsWith('58')){
+      digits = '58' + digits;
+    }
+    return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(text);
+  }
+
+  const SALON_NAME = 'KELLY HAIR STYLIST';
+  const PAGO_MOVIL = {
+    banco: 'Banco de Venezuela',
+    ci: '19824720',
+    telefono: '04121702464',
+  };
+
+  // ------------------------------------------------------------
+  // TASA BCV (Bs. por 1 €) — se consulta al generar cada factura,
+  // con caché para no depender de internet cada vez y dos fuentes
+  // gratuitas por si una falla.
+  // ------------------------------------------------------------
+  let bcvCache = null; // { rate, fetchedAt }
+
+  async function fetchWithTimeout(url, ms){
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), ms);
+    try{
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(t);
+      if (!res.ok) throw new Error('bad status');
+      return await res.json();
+    }catch(e){
+      clearTimeout(t);
+      throw e;
+    }
+  }
+
+  async function fetchBCVRate(){
+    // Fuente 1
+    try{
+      const data = await fetchWithTimeout('https://bcv-api-ashy.vercel.app/api/tasa', 4000);
+      const rate = parseFloat(data?.bcv?.eur);
+      if (rate > 0) return rate;
+    }catch(e){ /* seguimos con la siguiente fuente */ }
+    // Fuente 2
+    try{
+      const data = await fetchWithTimeout('https://thehermit007.github.io/Quadra_API/data.json', 4000);
+      const rate = parseFloat(data?.rates?.EUR);
+      if (rate > 0) return rate;
+    }catch(e){ /* sin suerte tampoco */ }
+    return null;
+  }
+
+  async function getBCVRate(){
+    const now = Date.now();
+    if (bcvCache && (now - bcvCache.fetchedAt) < 6 * 60 * 60 * 1000){
+      return bcvCache; // reutiliza si se pidió hace menos de 6 horas
+    }
+    const rate = await fetchBCVRate();
+    if (rate){
+      bcvCache = { rate, fetchedAt: now };
+      try{ await window.storage.set('bcvRateCache', JSON.stringify(bcvCache), false); }catch(e){}
+      return bcvCache;
+    }
+    // Sin internet o las dos fuentes fallaron: usa el último valor guardado.
+    if (!bcvCache){
+      try{
+        const stored = await window.storage.get('bcvRateCache', false);
+        if (stored) bcvCache = JSON.parse(stored.value);
+      }catch(e){}
+    }
+    return bcvCache;
+  }
+
+  function fmtBs(n){
+    n = Number(n) || 0;
+    return 'Bs. ' + n.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  }
+
+  function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, align){
+    const words = text.split(' ');
+    let line = '';
+    let lines = [];
+    for (let i = 0; i < words.length; i++){
+      const test = line + words[i] + ' ';
+      if (ctx.measureText(test).width > maxWidth && line !== ''){
+        lines.push(line.trim());
+        line = words[i] + ' ';
+      } else {
+        line = test;
+      }
+    }
+    lines.push(line.trim());
+    lines.forEach((l, idx) => {
+      ctx.textAlign = align || 'left';
+      ctx.fillText(l, x, y + idx * lineHeight);
+    });
+    return lines.length * lineHeight;
+  }
+
+  let logoImg = null;
+  function loadLogo(){
+    if (logoImg) return Promise.resolve(logoImg);
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => { logoImg = img; resolve(img); };
+      img.onerror = () => resolve(null);
+      img.src = 'logo.png';
+    });
+  }
+
+  async function drawInvoice(payment, client){
+    const canvas = $('invoiceCanvas');
+    const items = paymentItems(payment);
+    const bcv = await getBCVRate();
+    const logo = await loadLogo();
+    const W = 720;
+
+    try{
+      await Promise.all([
+        document.fonts.load('700 40px Sora'),
+        document.fonts.load('600 24px Sora'),
+        document.fonts.load('400 22px Inter'),
+        document.fonts.load('600 22px Inter'),
+        document.fonts.load('700 46px Sora'),
+      ]);
+    }catch(e){ /* fonts best-effort */ }
+
+    // Se dibuja en un lienzo alto y al final se recorta a la altura real de la factura
+    const work = document.createElement('canvas');
+    work.width = W; work.height = 2400;
+    const ctx = work.getContext('2d');
+
+    const INK = '#2A2622', MUTED = '#7C7466', GOLD = '#B8893A', BRAND = '#8A6420';
+
+    ctx.fillStyle = '#FFFEFA';
+    ctx.fillRect(0, 0, W, work.height);
+
+    // Cabecera con el logo
+    const HEADER_H = 300;
+    ctx.fillStyle = '#F8F3E4';
+    ctx.fillRect(0, 0, W, HEADER_H);
+    const bar = ctx.createLinearGradient(0, 0, W, 0);
+    bar.addColorStop(0, '#E9D08D');
+    bar.addColorStop(0.5, '#B8893A');
+    bar.addColorStop(1, '#E9D08D');
+    ctx.fillStyle = bar;
+    ctx.fillRect(0, HEADER_H - 5, W, 5);
+    if (logo){
+      const lh = 250, lw = lh * logo.width / logo.height;
+      ctx.drawImage(logo, (W - lw) / 2, 20, lw, lh);
+    } else {
+      ctx.textAlign = 'center';
+      ctx.fillStyle = INK;
+      ctx.font = '800 72px Sora, serif';
+      ctx.fillText('Kelly', W/2, 150);
+      ctx.fillStyle = BRAND;
+      ctx.font = '600 24px Inter, sans-serif';
+      ctx.fillText('HAIR STYLIST', W/2, 200);
+    }
+
+    // "FACTURA" label
+    let y = HEADER_H + 64;
+    ctx.fillStyle = INK;
+    ctx.font = '700 30px Sora, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Factura', 60, y);
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(60, y+14); ctx.lineTo(150, y+14); ctx.stroke();
+
+    // Fecha/hora de la cita o servicio, cliente, emisión
+    y += 60;
+    const isAppointment = payment.remaining > 0;
+    ctx.fillStyle = MUTED;
+    ctx.font = '600 20px Inter, sans-serif';
+    ctx.fillText(isAppointment ? '📅 Cita agendada' : 'Fecha y hora del servicio', 60, y);
+    ctx.fillStyle = isAppointment ? GOLD : INK;
+    ctx.font = isAppointment ? '700 26px Sora, sans-serif' : '600 24px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(formatDateTime(payment.serviceDate), W - 60, y);
+
+    y += 42;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = MUTED;
+    ctx.font = '600 20px Inter, sans-serif';
+    ctx.fillText('Cliente', 60, y);
+    ctx.fillStyle = INK;
+    ctx.font = '700 24px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(client.name, W - 60, y);
+
+    y += 42;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = MUTED;
+    ctx.font = '600 20px Inter, sans-serif';
+    ctx.fillText('Factura emitida el', 60, y);
+    ctx.fillStyle = INK;
+    ctx.font = '600 20px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(formatDateTime(new Date().toISOString()), W - 60, y);
+
+    // Dashed divider
+    y += 34;
+    ctx.strokeStyle = '#EADFC6';
+    ctx.setLineDash([8, 8]);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(W-60, y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Service lines (uno o varios servicios)
+    y += 50;
+    items.forEach((item, idx) => {
+      if (idx > 0) y += 40;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = INK;
+      ctx.font = '600 24px Inter, sans-serif';
+      ctx.fillText(itemLabel(item), 60, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(fmtMoney(item.price * (item.qty||1)), W - 60, y);
+    });
+
+    if (payment.advance > 0){
+      y += 40;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = MUTED;
+      ctx.font = '500 20px Inter, sans-serif';
+      ctx.fillText('Anticipo pagado', 60, y);
+      ctx.textAlign = 'right';
+      ctx.fillText('- ' + fmtMoney(payment.advance), W - 60, y);
+    }
+    if (payment.remaining > 0){
+      y += 38;
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#C6425E';
+      ctx.font = '700 20px Inter, sans-serif';
+      ctx.fillText('Saldo restante', 60, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(fmtMoney(payment.remaining), W - 60, y);
+    }
+
+    // Solid divider
+    y += 34;
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(W-60, y); ctx.stroke();
+
+    // Total
+    y += 60;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = BRAND;
+    ctx.font = '700 28px Sora, sans-serif';
+    ctx.fillText('TOTAL', 60, y);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = INK;
+    ctx.font = '800 44px Sora, sans-serif';
+    ctx.fillText(fmtMoney(payment.total), W - 60, y);
+
+    if (bcv){
+      y += 42;
+      ctx.textAlign = 'right';
+      ctx.fillStyle = MUTED;
+      ctx.font = '600 22px Inter, sans-serif';
+      ctx.fillText('≈ ' + fmtBs(payment.total * bcv.rate), W - 60, y);
+      ctx.textAlign = 'left';
+      ctx.font = '400 14px Inter, sans-serif';
+      const fecha = new Date(bcv.fetchedAt).toLocaleDateString('es-VE');
+      ctx.fillText(`Tasa BCV: ${bcv.rate.toLocaleString('es-VE',{minimumFractionDigits:2})} Bs/€ (${fecha})`, 60, y);
+    }
+
+    // Caja de Pago Móvil
+    y += 55;
+    const boxH = bcv ? 180 : 150;
+    ctx.fillStyle = '#F6EFDC';
+    ctx.strokeStyle = '#E2CE96';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(60, y, W - 120, boxH, 16); else ctx.rect(60, y, W - 120, boxH);
+    ctx.fill();
+    ctx.stroke();
+
+    let py = y + 34;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = BRAND;
+    ctx.font = '700 20px Sora, sans-serif';
+    ctx.fillText('📱 Pago Móvil', 84, py);
+
+    py += 34;
+    ctx.font = '600 18px Inter, sans-serif';
+    ctx.fillStyle = INK;
+    ctx.fillText(`Banco: ${PAGO_MOVIL.banco}`, 84, py);
+    py += 28;
+    ctx.fillText(`C.I.: ${PAGO_MOVIL.ci}`, 84, py);
+    py += 28;
+    ctx.fillText(`Teléfono: ${PAGO_MOVIL.telefono}`, 84, py);
+    if (bcv){
+      py += 32;
+      ctx.font = '700 20px Inter, sans-serif';
+      ctx.fillStyle = BRAND;
+      ctx.fillText(`Monto a pagar: ${fmtBs(payment.total * bcv.rate)}`, 84, py);
+    }
+    y += boxH;
+
+    // Pie
+    y += 56;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = MUTED;
+    ctx.font = 'italic 400 20px Inter, sans-serif';
+    ctx.fillText('¡Gracias por tu preferencia!', W/2, y);
+    y += 30;
+    ctx.fillStyle = BRAND;
+    ctx.font = '600 15px Inter, sans-serif';
+    ctx.fillText('KELLY HAIR STYLIST', W/2, y);
+
+    // Recorte final a la altura real
+    const H = y + 46;
+    canvas.width = W;
+    canvas.height = H;
+    canvas.getContext('2d').drawImage(work, 0, 0, W, H, 0, 0, W, H);
+  }
+
+  function invoiceWhatsAppText(payment, client){
+    const items = paymentItems(payment);
+    const isAppointment = payment.remaining > 0;
+    let msg = `*${SALON_NAME}*\n\n`;
+    msg += `🧾 *Factura*\n`;
+    msg += isAppointment
+      ? `📅 *Cita agendada:* ${formatDateTime(payment.serviceDate)}\n`
+      : `Fecha y hora del servicio: ${formatDateTime(payment.serviceDate)}\n`;
+    msg += `Cliente: ${client.name}\n`;
+    msg += `Factura emitida el: ${formatDateTime(new Date().toISOString())}\n\n`;
+    items.forEach(item => {
+      msg += `${itemLabel(item)}: ${fmtMoney(item.price * (item.qty||1))}\n`;
+    });
+    msg += `\nTotal: ${fmtMoney(payment.total)}\n`;
+    if (bcvCache) {
+      msg += `≈ ${fmtBs(payment.total * bcvCache.rate)} (tasa BCV ${bcvCache.rate.toLocaleString('es-VE',{minimumFractionDigits:2})} Bs/€)\n`;
+    }
+    if (payment.advance > 0) msg += `Anticipo pagado: ${fmtMoney(payment.advance)}\n`;
+    if (payment.remaining > 0) msg += `Saldo restante: ${fmtMoney(payment.remaining)}\n`;
+    msg += `\n📱 *Pago Móvil*\n`;
+    msg += `Banco: ${PAGO_MOVIL.banco}\n`;
+    msg += `C.I.: ${PAGO_MOVIL.ci}\n`;
+    msg += `Teléfono: ${PAGO_MOVIL.telefono}\n`;
+    if (bcvCache){
+      msg += `Monto a pagar: ${fmtBs(payment.total * bcvCache.rate)}\n`;
+    }
+    msg += `\n¡Gracias por tu preferencia! 💕`;
+    return msg;
+  }
+
+  async function showInvoice(paymentId){
+    const p = payments.find(p => p.id === paymentId);
+    if (!p) return;
+    const client = clients.find(c => c.id === p.clientId) || {name:'Clienta', phone:''};
+    await drawInvoice(p, client);
+    const filename = `factura_${client.name.replace(/\s+/g,'_')}_${p.serviceDate}.png`;
+
+    $('invoiceWaLink').href = waLink(client.phone, invoiceWhatsAppText(p, client));
+    $('invoiceOverlay').classList.add('show');
+
+    $('invoiceDownloadBtn').onclick = () => {
+      const canvas = $('invoiceCanvas');
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    $('invoiceShareBtn').onclick = () => {
+      const canvas = $('invoiceCanvas');
+      canvas.toBlob(async (blob) => {
+        if (!blob) { showToast('No se pudo preparar la imagen'); return; }
+        const file = new File([blob], filename, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })){
+          try{
+            await navigator.share({
+              files: [file],
+              title: 'Factura Kelly Hair Stylist',
+              text: `Factura de ${client.name} — Kelly Hair Stylist`,
+            });
+          }catch(err){
+            // El usuario canceló el share, no hacemos nada
+          }
+        } else {
+          showToast('Tu navegador no permite compartir la imagen directo. Descárgala y adjúntala en WhatsApp.');
+        }
+      }, 'image/png');
+    };
+
+    $('invoiceCopyPayBtn').onclick = async () => {
+      let text = `Banco: ${PAGO_MOVIL.banco}\nC.I.: ${PAGO_MOVIL.ci}\nTeléfono: ${PAGO_MOVIL.telefono}`;
+      if (bcvCache) text += `\nMonto: ${fmtBs(p.total * bcvCache.rate)}`;
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast('Datos de Pago Móvil copiados');
+      }catch(e){
+        showToast('No se pudo copiar. Mantén presionado el botón para copiar manualmente.');
+      }
+    };
+  }
+
+  async function loadData(){
+    try{
+      const c = await window.storage.get('clients', false);
+      clients = c ? JSON.parse(c.value) : [];
+    }catch(e){ clients = []; }
+    try{
+      const p = await window.storage.get('payments', false);
+      payments = p ? JSON.parse(p.value) : [];
+    }catch(e){ payments = []; }
+    try{
+      const s = await window.storage.get('services', false);
+      services = s ? JSON.parse(s.value) : [];
+    }catch(e){ services = []; }
+    try{
+      const pr = await window.storage.get('products', false);
+      products = pr ? JSON.parse(pr.value) : [];
+    }catch(e){ products = []; }
+    render();
+  }
+
+  async function saveClients(){
+    try{ await window.storage.set('clients', JSON.stringify(clients), false); }
+    catch(e){ showToast('No se pudo guardar. Intenta de nuevo.'); }
+    pushToCloud();
+  }
+  async function savePayments(){
+    try{ await window.storage.set('payments', JSON.stringify(payments), false); }
+    catch(e){ showToast('No se pudo guardar. Intenta de nuevo.'); }
+    pushToCloud();
+  }
+  async function saveServices(){
+    try{ await window.storage.set('services', JSON.stringify(services), false); }
+    catch(e){ showToast('No se pudo guardar. Intenta de nuevo.'); }
+    pushToCloud();
+  }
+  async function saveProducts(){
+    try{ await window.storage.set('products', JSON.stringify(products), false); }
+    catch(e){ showToast('No se pudo guardar. Intenta de nuevo.'); }
+    pushToCloud();
+  }
+
+  function clientVisits(clientId){
+    return payments.filter(p => p.clientId === clientId).length;
+  }
+  function clientPending(clientId){
+    return payments.filter(p => p.clientId === clientId && p.remaining > 0);
+  }
+
+  function renderStats(){
+    $('statClients').textContent = clients.length;
+    const pendingPayments = payments.filter(p => p.remaining > 0);
+    $('statPending').textContent = pendingPayments.length;
+    const owed = pendingPayments.reduce((s,p)=> s + p.remaining, 0);
+    $('statOwed').textContent = fmtMoney(owed).replace('.00','');
+  }
+
+  function renderClients(){
+    const q = ($('searchClients').value || '').toLowerCase();
+    const list = $('clientList');
+    const filtered = clients.filter(c =>
+      c.name.toLowerCase().includes(q) || (c.phone||'').includes(q)
+    ).sort((a,b)=> a.name.localeCompare(b.name));
+
+    if (filtered.length === 0){
+      list.innerHTML = '<div class="empty"><b>Todavía no hay clientas</b>Toca el botón dorado de abajo para registrar la primera. Solo necesitas su nombre y teléfono, una sola vez.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(c => {
+      const visits = clientVisits(c.id);
+      const pending = clientPending(c.id);
+      const owed = pending.reduce((s,p)=>s+p.remaining,0);
+      const msg = owed > 0
+        ? `Hola ${c.name}, te escribo de Kelly Hair Stylist para recordarte que queda un saldo pendiente de ${fmtMoney(owed)}. ¡Gracias!`
+        : `Hola ${c.name}, te escribo de Kelly Hair Stylist. ¿Cómo estás?`;
+      return `
+        <div class="card">
+          <div class="client-row">
+            <div>
+              <div class="client-name">${c.name}</div>
+              <div class="client-phone">${c.phone || 'Sin teléfono'}</div>
+            </div>
+            <div class="visits-pill">${visits} ${visits===1?'visita':'visitas'}</div>
+          </div>
+          ${owed > 0 ? `<div class="balance-tag pend">Debe ${fmtMoney(owed)}</div>` : ''}
+          <div class="client-actions">
+            <a class="btn-mini wa" href="${waLink(c.phone, msg)}" target="_blank" rel="noopener">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11 11 0 003.7 17.2L2 22l4.9-1.6A11 11 0 1020.5 3.5zM12 20a8 8 0 01-4.1-1.1l-.3-.2-3 1 1-2.9-.2-.3A8 8 0 1112 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.2-.1-1-.4-2-1.2-.7-.7-1.2-1.5-1.4-1.7-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4.1-.2 0-.3 0-.4-.1-.1-.5-1.3-.7-1.8-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2 1 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1z"/></svg>
+              WhatsApp
+            </a>
+            <button class="btn-mini" onclick="KellyApp.editClient('${c.id}')">Editar</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderPaySelect(){
+    const sel = $('payClientSelect');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Selecciona una clienta...</option>' +
+      clients.slice().sort((a,b)=>a.name.localeCompare(b.name))
+        .map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    sel.value = current;
+  }
+
+  function renderServices(){
+    const list = $('serviceList');
+    if (services.length === 0){
+      list.innerHTML = '<p style="color:var(--muted); font-size:12.5px;">Aún no tienes servicios guardados.</p>';
+      return;
+    }
+    list.innerHTML = services.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(s => `
+      <div class="service-item">
+        <div>
+          <div class="service-name">${s.name}</div>
+          <div class="service-price">${fmtMoney(s.price)}</div>
+        </div>
+        <div class="service-actions">
+          <button onclick="KellyApp.editService('${s.id}')">Editar</button>
+          <button onclick="KellyApp.deleteService('${s.id}')">Eliminar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function stockBadge(stock){
+    if (stock <= 0) return `<span class="stock-badge out">Agotado</span>`;
+    if (stock <= 3) return `<span class="stock-badge low">Quedan ${stock}</span>`;
+    return `<span class="stock-badge">${stock} en stock</span>`;
+  }
+
+  function renderProducts(){
+    const list = $('productList');
+    if (products.length === 0){
+      list.innerHTML = '<p style="color:var(--muted); font-size:12.5px;">Aún no tienes productos guardados.</p>';
+    } else {
+      list.innerHTML = products.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p => `
+        <div class="service-item">
+          <div>
+            <div class="service-name">${p.name}</div>
+            <div class="service-price">${fmtMoney(p.price)} ${stockBadge(p.stock)}</div>
+          </div>
+          <div class="service-actions">
+            <button onclick="KellyApp.editProduct('${p.id}')">Editar</button>
+            <button onclick="KellyApp.deleteProduct('${p.id}')">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    $('storeProductCount').textContent = products.length;
+    const stockValue = products.reduce((s,p)=> s + (p.price * p.stock), 0);
+    $('storeStockValue').textContent = fmtMoney(stockValue).replace('.00','');
+    $('storeLowStock').textContent = products.filter(p => p.stock <= 3).length;
+  }
+
+  function renderLedger(){
+    const list = $('ledgerList');
+    const sorted = payments.slice().sort((a,b) => (b.serviceDate||'').localeCompare(a.serviceDate||''));
+
+    if (sorted.length === 0){
+      list.innerHTML = '<div class="empty"><b>Todavía no hay servicios registrados</b>Cuando registres un pago en la pestaña "Pago", aparecerá aquí tu libro diario.</div>';
+    } else {
+      list.innerHTML = sorted.map(p => {
+        const client = clients.find(c => c.id === p.clientId) || {name:'Clienta eliminada'};
+        return `
+          <div class="ledger-item">
+            <div class="ledger-left">
+              <div class="ledger-date">${formatDateTime(p.serviceDate)}</div>
+              <div class="ledger-name">${client.name}</div>
+              <div class="ledger-service">${paymentServiceSummary(p)}</div>
+            </div>
+            <div class="ledger-right">
+              <div class="ledger-total">${fmtMoney(p.total)}</div>
+              <div class="ledger-sub">${p.remaining > 0 ? 'Debe ' + fmtMoney(p.remaining) : 'Pagado completo'}</div>
+              <div class="ledger-icons">
+                <button class="icon-btn" title="Factura" onclick="KellyApp.showInvoice('${p.id}')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+                </button>
+                <button class="icon-btn" title="Eliminar" onclick="KellyApp.deletePayment('${p.id}')">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2m-9 0l1 14h8l1-14"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    const todayStr = new Date().toISOString().slice(0,10);
+    const monthStr = todayStr.slice(0,7);
+    const todayTotal = payments.filter(p => (p.serviceDate||'').startsWith(todayStr)).reduce((s,p)=>s+p.total,0);
+    const monthTotal = payments.filter(p => (p.serviceDate||'').startsWith(monthStr)).reduce((s,p)=>s+p.total,0);
+    $('ledgerToday').textContent = fmtMoney(todayTotal).replace('.00','');
+    $('ledgerMonth').textContent = fmtMoney(monthTotal).replace('.00','');
+    $('ledgerCount').textContent = payments.length;
+  }
+
+  function renderReminders(){
+    const list = $('remindersList');
+    const pending = payments.filter(p => p.remaining > 0)
+      .sort((a,b) => (a.reminderDate||'9999').localeCompare(b.reminderDate||'9999'));
+
+    if (pending.length === 0){
+      list.innerHTML = '<div class="empty"><b>Sin pagos pendientes</b>Cuando registres un anticipo con saldo restante, aparecerá aquí para que no se te olvide cobrarlo.</div>';
+      return;
+    }
+
+    const today = new Date().toISOString().slice(0,10);
+
+    list.innerHTML = pending.map(p => {
+      const client = clients.find(c => c.id === p.clientId) || {name:'Clienta eliminada', phone:''};
+      const overdue = p.reminderDate && p.reminderDate < today;
+      const soon = p.reminderDate && !overdue && p.reminderDate <= addDays(today, 3);
+      const msg = `Hola ${client.name}, te escribo de Kelly Hair Stylist para recordarte que queda un saldo pendiente de ${fmtMoney(p.remaining)} por "${paymentServiceSummary(p)}". ¡Gracias!`;
+      return `
+        <div class="rem-item ${overdue ? 'overdue':''}">
+          <div class="rem-top">
+            <div>
+              <div class="rem-name">${client.name}</div>
+              <div class="rem-service">${paymentServiceSummary(p)}</div>
+              <div class="rem-service">📅 ${formatDateTime(p.serviceDate)}</div>
+            </div>
+            <div class="rem-amount">${fmtMoney(p.remaining)}</div>
+          </div>
+          <div class="rem-date ${overdue?'overdue':(soon?'soon':'')}">
+            ${p.reminderDate ? (overdue ? 'Atrasado · ' : 'Cobrar el ') + formatDate(p.reminderDate) : 'Sin fecha de recordatorio'}
+          </div>
+          <div class="rem-actions">
+            <a class="btn-mini wa" href="${waLink(client.phone, msg)}" target="_blank" rel="noopener">Recordar por WhatsApp</a>
+            <button class="btn-mini" onclick="KellyApp.showInvoice('${p.id}')">Factura</button>
+            <button class="btn-mini" onclick="KellyApp.markPaid('${p.id}')">Marcar cobrado</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function addDays(dateStr, n){
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0,10);
+  }
+  function formatDate(dateStr){
+    const datePart = (dateStr || '').split('T')[0];
+    const d = new Date(datePart + 'T00:00:00');
+    return d.toLocaleDateString('es-VE', {day:'numeric', month:'short'});
+  }
+  function formatDateTime(dateStr){
+    if (!dateStr) return '';
+    const hasTime = dateStr.includes('T');
+    const d = hasTime ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+    const datePart = d.toLocaleDateString('es-VE', {day:'numeric', month:'short'});
+    if (!hasTime) return datePart;
+    const timePart = d.toLocaleTimeString('es-VE', {hour:'numeric', minute:'2-digit'});
+    return `${datePart}, ${timePart}`;
+  }
+
+  function render(){
+    renderStats();
+    renderClients();
+    renderPaySelect();
+    renderServices();
+    renderProducts();
+    renderLedger();
+    renderReminders();
+  }
+
+
+
+  function updateRemainingPreview(){
+    const total = computeItemsTotal();
+    const adv = parseFloat($('payAdvance').value) || 0;
+    const rem = Math.max(total - adv, 0);
+    $('remainingPreview').textContent = fmtMoney(rem);
+  }
+
+  function openSheet(mode, client){
+    editingClientId = client ? client.id : null;
+    $('sheetTitle').textContent = client ? 'Editar clienta' : 'Nueva clienta';
+    $('newName').value = client ? client.name : '';
+    $('newPhone').value = client ? client.phone : '';
+    $('pickBlock').style.display = client ? 'none' : 'block';
+    $('pickContactsBtn').style.display = contactPickerSupported ? 'block' : 'none';
+    $('vcfImportLabel').style.display = contactPickerSupported ? 'none' : 'block';
+    $('overlay').classList.add('show');
+  }
+  function closeSheet(){
+    $('overlay').classList.remove('show');
+  }
+
+  async function saveClient(){
+    const name = $('newName').value.trim();
+    const phone = $('newPhone').value.trim();
+    if (!name){ showToast('Escribe el nombre de la clienta'); return; }
+    let newId = null;
+    if (editingClientId){
+      const c = clients.find(c => c.id === editingClientId);
+      c.name = name; c.phone = phone;
+    } else {
+      newId = 'c_' + Date.now();
+      clients.push({ id: newId, name, phone, createdAt: new Date().toISOString() });
+    }
+    await saveClients();
+    closeSheet();
+    render();
+    if (newId && quickAddFromPay){
+      $('payClientSelect').value = newId;
+      quickAddFromPay = false;
+    }
+    showToast('Clienta guardada');
+  }
+
+  // ------------------------------------------------------------
+  // AGREGAR CLIENTAS DESDE LOS CONTACTOS DEL CELULAR
+  // - Chrome en Android: selector nativo de contactos (Contact Picker API).
+  // - iPhone / navegadores sin esa función: importar archivo .vcf.
+  // ------------------------------------------------------------
+  function phoneKey(p){
+    return (p || '').replace(/\D/g, '').slice(-10);
+  }
+
+  async function addContactsAsClients(list){
+    let added = 0, skipped = 0, targetId = null;
+    list.forEach(({ name, phone }) => {
+      name = (name || '').trim();
+      phone = (phone || '').replace(/\s+/g, ' ').trim();
+      if (!name && !phone) return;
+      if (!name) name = phone;
+      const key = phoneKey(phone);
+      const existing = clients.find(c =>
+        key ? phoneKey(c.phone) === key : c.name.toLowerCase() === name.toLowerCase()
+      );
+      if (existing){ skipped++; targetId = existing.id; return; }
+      const id = 'c_' + Date.now() + '_' + added;
+      clients.push({ id, name, phone, createdAt: new Date().toISOString() });
+      targetId = id;
+      added++;
+    });
+    if (!added && !skipped) return;
+    if (added) await saveClients();
+    closeSheet();
+    render();
+    if (quickAddFromPay && list.length === 1 && targetId){
+      $('payClientSelect').value = targetId;
+    }
+    quickAddFromPay = false;
+    if (added){
+      showToast(`${added} ${added === 1 ? 'clienta agregada' : 'clientas agregadas'}` + (skipped ? ` (${skipped} ya existían)` : ''));
+    } else {
+      showToast(skipped === 1 ? 'Esa clienta ya estaba registrada' : 'Esas clientas ya estaban registradas');
+    }
+  }
+
+  async function pickFromContacts(){
+    if (!contactPickerSupported){
+      showToast('Tu navegador no puede abrir los contactos. Usa Chrome en Android.');
+      return;
+    }
+    let picked;
+    try{
+      picked = await navigator.contacts.select(['name', 'tel'], { multiple: true });
+    }catch(e){
+      showToast('No se pudo abrir tus contactos. Revisa el permiso del navegador.');
+      return;
+    }
+    if (!picked || !picked.length) return;
+    await addContactsAsClients(picked.map(c => ({
+      name: (c.name && c.name[0]) || '',
+      phone: (c.tel && c.tel[0]) || '',
+    })));
+  }
+
+  function parseVCards(text){
+    const out = [];
+    text.split(/BEGIN:VCARD/i).slice(1).forEach(card => {
+      const lines = card.replace(/\r?\n[ \t]/g, '').split(/\r?\n/);
+      let name = '', tel = '';
+      lines.forEach(l => {
+        const val = l.slice(l.indexOf(':') + 1).trim();
+        if (!name && /^FN[;:]/i.test(l)) name = val;
+        else if (!name && /^N[;:]/i.test(l)){
+          const p = val.split(';');
+          name = ((p[1] || '') + ' ' + (p[0] || '')).trim();
+        }
+        if (!tel && /^(item\d+\.)?TEL[;:]/i.test(l)) tel = val;
+      });
+      if (name || tel) out.push({ name, phone: tel });
+    });
+    return out;
+  }
+
+  async function importVcf(e){
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    let list = [];
+    for (const f of files){
+      try{ list = list.concat(parseVCards(await f.text())); }catch(err){ /* archivo ilegible */ }
+    }
+    e.target.value = '';
+    if (!list.length){ showToast('No encontré contactos en ese archivo'); return; }
+    await addContactsAsClients(list);
+  }
+
+  async function savePayment(){
+    const clientId = $('payClientSelect').value;
+    const items = collectItems();
+    const total = items.reduce((s,i)=>s + i.price * i.qty, 0);
+    const advance = parseFloat($('payAdvance').value) || 0;
+    const serviceDate = $('payServiceDate').value;
+    const reminderDate = $('payReminderDate').value;
+
+    if (!clientId){ showToast('Selecciona una clienta'); return; }
+    if (items.length === 0){ showToast('Agrega al menos un servicio o producto con su precio'); return; }
+
+    const remaining = Math.max(total - advance, 0);
+    payments.push({
+      id: 'p_' + Date.now(),
+      clientId, items, total, advance, remaining,
+      serviceDate: serviceDate || new Date().toISOString().slice(0,16),
+      reminderDate: remaining > 0 ? reminderDate : '',
+    });
+    await savePayments();
+    await applyStockChanges(items, -1);
+
+    $('itemsContainer').innerHTML = '';
+    addItemRow();
+    $('payAdvance').value = '';
+    $('payReminderDate').value = '';
+    updateItemsTotal();
+
+    render();
+    showToast('Venta registrada');
+  }
+
+  async function markPaid(paymentId){
+    const p = payments.find(p => p.id === paymentId);
+    if (p){ p.remaining = 0; p.reminderDate = ''; }
+    await savePayments();
+    render();
+    showToast('Marcado como cobrado');
+  }
+
+  async function deletePayment(paymentId){
+    if (!confirm('¿Eliminar este registro del libro diario? Si tenía productos, se devolverán al inventario.')) return;
+    const p = payments.find(p => p.id === paymentId);
+    if (p) await applyStockChanges(paymentItems(p), +1);
+    payments = payments.filter(p => p.id !== paymentId);
+    await savePayments();
+    render();
+    showToast('Registro eliminado');
+  }
+
+  async function addService(){
+    const name = $('newServiceName').value.trim();
+    const price = parseFloat($('newServicePrice').value) || 0;
+    if (!name){ showToast('Escribe el nombre del servicio'); return; }
+    services.push({ id: 's_' + Date.now(), name, price });
+    await saveServices();
+    $('newServiceName').value = '';
+    $('newServicePrice').value = '';
+    render();
+    showToast('Servicio agregado');
+  }
+
+  async function editService(serviceId){
+    const s = services.find(s => s.id === serviceId);
+    if (!s) return;
+    const newName = prompt('Nombre del servicio:', s.name);
+    if (newName === null) return;
+    const newPriceStr = prompt('Precio:', s.price);
+    if (newPriceStr === null) return;
+    s.name = newName.trim() || s.name;
+    s.price = parseFloat(newPriceStr) || s.price;
+    await saveServices();
+    render();
+    showToast('Servicio actualizado');
+  }
+
+  async function deleteService(serviceId){
+    if (!confirm('¿Eliminar este servicio de la lista?')) return;
+    services = services.filter(s => s.id !== serviceId);
+    await saveServices();
+    render();
+    showToast('Servicio eliminado');
+  }
+
+  async function addProduct(){
+    const name = $('newProductName').value.trim();
+    const price = parseFloat($('newProductPrice').value) || 0;
+    const stock = Math.max(parseInt($('newProductStock').value, 10) || 0, 0);
+    if (!name){ showToast('Escribe el nombre del producto'); return; }
+    products.push({ id: 'pr_' + Date.now(), name, price, stock });
+    await saveProducts();
+    $('newProductName').value = '';
+    $('newProductPrice').value = '';
+    $('newProductStock').value = '';
+    render();
+    showToast('Producto agregado');
+  }
+
+  async function editProduct(productId){
+    const p = products.find(p => p.id === productId);
+    if (!p) return;
+    const newName = prompt('Nombre del producto:', p.name);
+    if (newName === null) return;
+    const newPriceStr = prompt('Precio:', p.price);
+    if (newPriceStr === null) return;
+    const newStockStr = prompt('Unidades en stock:', p.stock);
+    if (newStockStr === null) return;
+    p.name = newName.trim() || p.name;
+    p.price = parseFloat(newPriceStr) || p.price;
+    p.stock = Math.max(parseInt(newStockStr, 10) || 0, 0);
+    await saveProducts();
+    render();
+    showToast('Producto actualizado');
+  }
+
+  async function deleteProduct(productId){
+    if (!confirm('¿Eliminar este producto del inventario?')) return;
+    products = products.filter(p => p.id !== productId);
+    await saveProducts();
+    render();
+    showToast('Producto eliminado');
+  }
+
+  function downloadBackup(){
+    const data = {
+      exportedAt: new Date().toISOString(),
+      clients, payments, services, products
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `respaldo_kelly_hair_stylist_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Copia de seguridad descargada');
+  }
+
+  function restoreBackup(file){
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try{
+        const data = JSON.parse(e.target.result);
+        if (!Array.isArray(data.clients) || !Array.isArray(data.payments)){
+          showToast('Ese archivo no parece un respaldo válido');
+          return;
+        }
+        if (!confirm('Esto reemplazará los datos actuales de la app con los del archivo. ¿Continuar?')) return;
+        clients = data.clients || [];
+        payments = data.payments || [];
+        services = data.services || [];
+        products = data.products || [];
+        await saveClients();
+        await savePayments();
+        await saveServices();
+        await saveProducts();
+        render();
+        showToast('Copia de seguridad restaurada');
+      }catch(err){
+        showToast('No se pudo leer el archivo');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function downloadExcelLedger(){
+    if (typeof XLSX === 'undefined'){
+      showToast('No se pudo cargar el generador de Excel (revisa tu conexión)');
+      return;
+    }
+    const rows = payments.slice()
+      .sort((a,b) => (a.serviceDate||'').localeCompare(b.serviceDate||''))
+      .map(p => {
+        const client = clients.find(c => c.id === p.clientId) || { name: 'Clienta eliminada' };
+        return {
+          'Fecha': (p.serviceDate||'').split('T')[0],
+          'Hora': (p.serviceDate||'').includes('T') ? p.serviceDate.split('T')[1] : '',
+          'Cliente': client.name,
+          'Servicios / Productos': paymentServiceSummary(p),
+          'Total': p.total,
+          'Anticipo': p.advance,
+          'Restante': p.remaining,
+        };
+      });
+    if (rows.length === 0){
+      showToast('Todavía no hay movimientos que exportar');
+      return;
+    }
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{wch:12},{wch:8},{wch:22},{wch:32},{wch:10},{wch:10},{wch:10}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Registro Diario');
+    const stamp = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `registro_diario_kelly_${stamp}.xlsx`);
+    showToast('Excel descargado');
+  }
+
+  function editClient(clientId){
+    const c = clients.find(c => c.id === clientId);
+    openSheet('edit', c);
+  }
+
+  function switchTab(tab){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    $('view-' + tab).classList.add('active');
+    if (tab === 'pago') ensureAtLeastOneRow();
+  }
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => switchTab(t.dataset.tab));
+  });
+  $('fabAdd').addEventListener('click', () => openSheet('new', null));
+  $('quickAddBtn').addEventListener('click', () => { quickAddFromPay = true; openSheet('new', null); });
+  $('sheetClose').addEventListener('click', closeSheet);
+  $('overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') closeSheet(); });
+  $('invoiceClose').addEventListener('click', () => $('invoiceOverlay').classList.remove('show'));
+  $('invoiceOverlay').addEventListener('click', (e) => { if (e.target.id === 'invoiceOverlay') $('invoiceOverlay').classList.remove('show'); });
+  $('saveClientBtn').addEventListener('click', saveClient);
+  $('pickContactsBtn').addEventListener('click', pickFromContacts);
+  $('vcfInput').addEventListener('change', importVcf);
+  $('savePayBtn').addEventListener('click', savePayment);
+  $('searchClients').addEventListener('input', renderClients);
+  $('payAdvance').addEventListener('input', updateRemainingPreview);
+  $('addServiceBtn').addEventListener('click', addService);
+  $('addItemBtn').addEventListener('click', () => addItemRow());
+  $('addProductBtn').addEventListener('click', addProduct);
+  $('downloadBackupBtn').addEventListener('click', downloadBackup);
+  $('downloadExcelBtn').addEventListener('click', downloadExcelLedger);
+  $('restoreFileInput').addEventListener('change', (e) => restoreBackup(e.target.files[0]));
+
+  window.KellyApp = { editClient, markPaid, deletePayment, editService, deleteService, editProduct, deleteProduct, showInvoice };
+
+  // Instalación como app (PWA)
+  let deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    $('installBtn').style.display = 'flex';
+  });
+  $('installBtn').addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    $('installBtn').style.display = 'none';
+  });
+  window.addEventListener('appinstalled', () => {
+    $('installBtn').style.display = 'none';
+  });
+
+  if ('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+
+  ensureAtLeastOneRow();
+  loadData();
+  initCloudSync();
+})();
+</script>
+</body>
+</html>
