@@ -419,6 +419,19 @@
     gap:5px;
   }
 
+  /* Pantalla de entrada (inicio de sesión) */
+  .gate{
+    position:fixed; inset:0; z-index:45;
+    background:linear-gradient(160deg, #FFFDF8 0%, #FAF5E6 60%, #F3EACF 100%);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px; overflow-y:auto;
+  }
+  .gate-card{ width:100%; max-width:340px; text-align:center; }
+  .gate-logo{ height:180px; width:auto; display:block; margin:0 auto 6px; }
+  .gate h2{ font-family:'Sora',sans-serif; font-size:19px; margin:10px 0 6px; color:var(--ink); }
+  .gate p{ font-size:13px; color:var(--muted); line-height:1.5; margin:0 0 18px; min-height:1px; }
+  .gate .btn-main{ margin-top:8px; }
+
   /* Elegir contactos */
   .or-divider{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:11.5px; margin:14px 0; }
   .or-divider::before, .or-divider::after{ content:""; flex:1; height:1px; background:var(--line); }
@@ -426,6 +439,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
+
+<div class="gate" id="loginGate">
+  <div class="gate-card">
+    <img class="gate-logo" src="logo.png" alt="Kelly Hair Stylist">
+    <h2 id="gateTitle">Cargando…</h2>
+    <p id="gateMsg"></p>
+    <button class="btn-main" id="gateSignInBtn" style="display:none;">Iniciar sesión con Google</button>
+    <button class="btn-main secondary" id="gateSignOutBtn" style="display:none;">Cerrar sesión</button>
+    <button class="btn-main secondary" id="gateReloadBtn" style="display:none;" onclick="location.reload()">Reintentar</button>
+  </div>
+</div>
+<script>
+  // Si el código principal no llega a arrancar (por ejemplo, sin internet la primera vez), se avisa.
+  setTimeout(function(){
+    if (window.__kellyBooted) return;
+    document.getElementById('gateTitle').textContent = 'No se pudo cargar';
+    document.getElementById('gateMsg').textContent = 'Revisa tu conexión a internet y vuelve a intentar.';
+    document.getElementById('gateReloadBtn').style.display = 'block';
+  }, 10000);
+</script>
 
 <div class="app">
   <div class="hdr">
@@ -549,6 +582,13 @@
   <!-- AJUSTES: SERVICIOS + RESPALDO -->
   <div class="view" id="view-ajustes">
     <div class="settings-block">
+      <h3>Cuenta y sincronización</h3>
+      <p id="accountStatus"></p>
+      <button class="btn-main" id="signInBtn">Iniciar sesión con Google</button>
+      <button class="btn-main secondary" id="signOutBtn" style="display:none;">Cerrar sesión</button>
+    </div>
+
+    <div class="settings-block">
       <h3>Servicios y precios</h3>
       <p>Agrega aquí tu lista de servicios para elegirlos rápido al registrar un pago.</p>
       <div id="serviceList"></div>
@@ -628,35 +668,41 @@ import {
   getFirestore, doc, setDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import {
-  getAuth, signInAnonymously
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+  getRedirectResult, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 // ============================================================
-// SINCRONIZACIÓN EN TIEMPO REAL (Firebase) — CONFIGURA AQUÍ
-// ------------------------------------------------------------
-// 1. Crea un proyecto gratis en https://console.firebase.google.com
-// 2. Activa "Firestore Database" (modo producción) y "Authentication"
-//    → método "Anónimo".
-// 3. En Configuración del proyecto → tus apps → app web, copia el
-//    objeto de configuración y pégalo reemplazando el de abajo.
-// Si dejas los valores de ejemplo tal cual, la app funciona normal
-// pero SOLO en este celular, sin sincronizar con otros.
+// SINCRONIZACIÓN EN TIEMPO REAL (Firebase) — proyecto propio de Kelly
+// Se entra con una cuenta de Google y las reglas de Firestore dejan
+// pasar solo a los correos autorizados. Sin iniciar sesión, la app
+// funciona igual pero guarda todo solo en este celular.
 // ============================================================
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCtG6vH1LXlpg2L-0vXxcGkmhAK3sELW0o",
-  authDomain: "salon-rosel.firebaseapp.com",
-  projectId: "salon-rosel",
-  storageBucket: "salon-rosel.firebasestorage.app",
-  messagingSenderId: "480933905619",
-  appId: "1:480933905619:web:4538df63988d4456448026"
+  apiKey: "AIzaSyAj1wTaxVuM7yxB06Jcbr_lkFOQnTomcXA",
+  authDomain: "kelly-hair-stylist.firebaseapp.com",
+  projectId: "kelly-hair-stylist",
+  storageBucket: "kelly-hair-stylist.firebasestorage.app",
+  messagingSenderId: "584250792926",
+  appId: "1:584250792926:web:162890fe91c59969be9b4f",
+  measurementId: "G-3EHQMSFL17"
 };
 const SYNC_ENABLED = FIREBASE_CONFIG.apiKey !== "TU_API_KEY";
-const SALON_DOC = ['salones', 'kelly']; // colección/documento compartido (propio de Kelly)
+const SALON_DOC = ['salones', 'kelly']; // colección/documento compartido
 
 let cloudDb = null;
+let cloudAuth = null;
 let cloudReady = false;
 let applyingRemoteUpdate = false;
-let pendingLocalPush = false;
+let unsubscribeSnap = null;
+let currentUser = null;
+let syncState = 'off';
+let authReady = false;      // ya se sabe si hay sesión iniciada o no
+let verifiedEmail = '';     // correo que ya fue aceptado por la nube en este celular
+let initFailed = false;
+let verifyTimer = null;
+let verifyTimedOut = false;
+window.__kellyBooted = true;
 
 (function(){
   // Si la app se abre fuera del entorno de Claude (por ejemplo, publicada en
@@ -706,77 +752,225 @@ let pendingLocalPush = false;
   const contactPickerSupported = !!(navigator.contacts && navigator.contacts.select && 'ContactsManager' in window);
 
   function updateSyncBadge(state){
-    // state: 'off' | 'connecting' | 'on' | 'error'
+    // state: 'off' | 'signedout' | 'connecting' | 'on' | 'denied' | 'error'
+    syncState = state;
     const el = $('syncBadge');
-    if (!el) return;
-    if (state === 'on'){
-      el.textContent = '☁ Sincronizado';
-      el.style.display = 'inline-block';
-      el.style.background = 'rgba(62,143,92,.25)';
-    } else if (state === 'connecting'){
-      el.textContent = '☁ Conectando...';
-      el.style.display = 'inline-block';
-      el.style.background = 'rgba(42,38,34,.08)';
-    } else if (state === 'error'){
-      el.textContent = '⚠ Sin conexión a la nube';
-      el.style.display = 'inline-block';
-      el.style.background = 'rgba(198,66,94,.35)';
-    } else {
-      el.style.display = 'none';
+    if (el){
+      el.style.cursor = state === 'signedout' ? 'pointer' : 'default';
+      const show = (text, bg) => { el.textContent = text; el.style.display = 'inline-block'; el.style.background = bg; };
+      if (state === 'on') show('☁ Sincronizado', 'rgba(62,143,92,.22)');
+      else if (state === 'connecting') show('☁ Conectando...', 'rgba(42,38,34,.08)');
+      else if (state === 'signedout') show('🔒 Iniciar sesión para sincronizar', 'rgba(201,162,77,.3)');
+      else if (state === 'denied') show('⛔ Este correo no tiene acceso', 'rgba(198,66,94,.25)');
+      else if (state === 'error') show('⚠ Sin conexión a la nube', 'rgba(198,66,94,.25)');
+      else el.style.display = 'none';
+    }
+    renderAccount();
+    updateGate();
+  }
+
+  function renderAccount(){
+    const status = $('accountStatus'), inBtn = $('signInBtn'), outBtn = $('signOutBtn');
+    if (!status) return;
+    if (!SYNC_ENABLED){
+      status.textContent = 'La sincronización no está configurada. La app guarda los datos solo en este celular.';
+      inBtn.style.display = 'none'; outBtn.style.display = 'none';
+      return;
+    }
+    if (!currentUser){
+      status.textContent = 'Inicia sesión con la cuenta de Gmail autorizada para entrar a la app y compartir los datos entre celulares.';
+      inBtn.style.display = 'block'; outBtn.style.display = 'none';
+      return;
+    }
+    const email = currentUser.email || 'tu cuenta';
+    status.textContent = syncState === 'denied'
+      ? `Entraste como ${email}, pero ese correo no tiene permiso. Cierra sesión y entra con la cuenta autorizada.`
+      : `Sesión iniciada como ${email}. Tus datos se sincronizan entre celulares.`;
+    inBtn.style.display = 'none'; outBtn.style.display = 'block';
+  }
+
+  // Pantalla de entrada: la app solo se ve con una sesión iniciada y aceptada por la nube.
+  // Si este celular ya fue aceptado antes, entra directo aunque no haya internet.
+  function updateGate(){
+    const gate = $('loginGate');
+    if (!gate) return;
+    if (!SYNC_ENABLED){ gate.style.display = 'none'; return; }
+
+    let state;
+    if (initFailed && !authReady) state = 'failed';
+    else if (!authReady) state = 'loading';
+    else if (!currentUser) state = 'signin';
+    else if (syncState === 'denied') state = 'denied';
+    else if (verifiedEmail && verifiedEmail === currentUser.email) state = 'ok';
+    else state = 'verifying';
+
+    if (state !== 'verifying'){
+      if (verifyTimer){ clearTimeout(verifyTimer); verifyTimer = null; }
+      verifyTimedOut = false;
+    }
+    if (state === 'ok'){ gate.style.display = 'none'; return; }
+    gate.style.display = 'flex';
+
+    const show = (title, msg, btnIn, btnOut, btnReload) => {
+      $('gateTitle').textContent = title;
+      $('gateMsg').textContent = msg;
+      $('gateSignInBtn').style.display = btnIn ? 'block' : 'none';
+      $('gateSignOutBtn').style.display = btnOut ? 'block' : 'none';
+      $('gateReloadBtn').style.display = btnReload ? 'block' : 'none';
+    };
+    if (state === 'loading') show('Cargando…', '', false, false, false);
+    else if (state === 'failed') show('No se pudo conectar', 'Revisa tu conexión a internet e intenta de nuevo.', false, false, true);
+    else if (state === 'signin') show('Inicia sesión para entrar', 'Usa la cuenta de Gmail autorizada de Kelly Hair Stylist.', true, false, false);
+    else if (state === 'denied') show('Este correo no tiene acceso', `Entraste como ${currentUser.email}. Cierra sesión y entra con la cuenta autorizada.`, false, true, false);
+    else {
+      if (!verifyTimer){
+        verifyTimer = setTimeout(() => { verifyTimedOut = true; updateGate(); }, 8000);
+      }
+      show('Verificando acceso…',
+        verifyTimedOut ? 'Está tardando más de lo normal. Revisa tu conexión: la primera vez que entras en este celular hace falta internet.' : '',
+        false, verifyTimedOut, false);
     }
   }
 
-  async function pushToCloud(){
-    if (!SYNC_ENABLED || !cloudReady || applyingRemoteUpdate){
-      pendingLocalPush = !cloudReady && SYNC_ENABLED;
-      return;
-    }
+  function setVerified(email){
+    verifiedEmail = email || '';
     try{
-      const ref = doc(cloudDb, ...SALON_DOC);
-      await setDoc(ref, {
+      if (verifiedEmail) window.storage.set('verifiedEmail', verifiedEmail, false);
+      else window.storage.delete('verifiedEmail', false);
+    }catch(e){}
+  }
+  async function readVerified(){
+    try{
+      const r = await window.storage.get('verifiedEmail', false);
+      return r ? r.value : '';
+    }catch(e){ return ''; }
+  }
+
+  // Marca persistente: hay cambios hechos en este celular que aún no llegaron a la nube
+  // (por ejemplo, se trabajó sin sesión iniciada). Al conectar, se combinan en vez de perderse.
+  function markUnsynced(flag){
+    try{
+      if (flag) window.storage.set('unsynced', '1', false);
+      else window.storage.delete('unsynced', false);
+    }catch(e){}
+  }
+  async function wasUnsynced(){
+    try{
+      const r = await window.storage.get('unsynced', false);
+      return !!(r && r.value === '1');
+    }catch(e){ return false; }
+  }
+  function mergeById(remote, local){
+    const map = new Map();
+    (remote || []).forEach(x => map.set(x.id, x));
+    (local || []).forEach(x => { if (!map.has(x.id)) map.set(x.id, x); });
+    return Array.from(map.values());
+  }
+  async function persistLocal(){
+    try{
+      await window.storage.set('clients', JSON.stringify(clients), false);
+      await window.storage.set('payments', JSON.stringify(payments), false);
+      await window.storage.set('services', JSON.stringify(services), false);
+      await window.storage.set('products', JSON.stringify(products), false);
+    }catch(e){}
+  }
+
+  async function pushToCloud(){
+    if (!SYNC_ENABLED || applyingRemoteUpdate) return;
+    if (!cloudReady){ markUnsynced(true); return; }
+    try{
+      await setDoc(doc(cloudDb, ...SALON_DOC), {
         clients, payments, services, products,
         updatedAt: new Date().toISOString()
       });
+      markUnsynced(false);
     }catch(e){
       console.error('No se pudo sincronizar con la nube', e);
-      updateSyncBadge('error');
+      markUnsynced(true);
+      const denied = !!(e && e.code === 'permission-denied');
+      if (denied) setVerified('');
+      updateSyncBadge(denied ? 'denied' : 'error');
     }
   }
 
   async function initCloudSync(){
-    if (!SYNC_ENABLED) { updateSyncBadge('off'); return; }
+    if (!SYNC_ENABLED){ updateSyncBadge('off'); return; }
     updateSyncBadge('connecting');
     try{
       const app = initializeApp(FIREBASE_CONFIG);
-      const auth = getAuth(app);
-      await signInAnonymously(auth);
+      cloudAuth = getAuth(app);
       cloudDb = getFirestore(app);
-      const ref = doc(cloudDb, ...SALON_DOC);
-      onSnapshot(ref, (snap) => {
-        cloudReady = true;
-        updateSyncBadge('on');
-        if (!snap.exists()){
-          // Primera vez: sube lo que ya haya en este celular.
-          pushToCloud();
-          return;
-        }
-        const data = snap.data();
-        applyingRemoteUpdate = true;
-        clients = data.clients || [];
-        payments = data.payments || [];
-        services = data.services || [];
-        products = data.products || [];
-        render();
-        applyingRemoteUpdate = false;
-        if (pendingLocalPush){ pendingLocalPush = false; pushToCloud(); }
-      }, (err) => {
-        console.error('Error de sincronización', err);
-        updateSyncBadge('error');
+      getRedirectResult(cloudAuth).catch(() => {});
+      onAuthStateChanged(cloudAuth, async (user) => {
+        if (unsubscribeSnap){ unsubscribeSnap(); unsubscribeSnap = null; }
+        cloudReady = false;
+        verifiedEmail = await readVerified();
+        currentUser = user;
+        authReady = true;
+        if (!user){ setVerified(''); updateSyncBadge('signedout'); return; }
+        updateSyncBadge('connecting');
+        unsubscribeSnap = onSnapshot(doc(cloudDb, ...SALON_DOC), async (snap) => {
+          cloudReady = true;
+          const unsynced = await wasUnsynced();
+          if (currentUser && verifiedEmail !== currentUser.email) setVerified(currentUser.email);
+          updateSyncBadge('on');
+          if (!snap.exists()){
+            // Primera vez: sube lo que ya haya en este celular.
+            pushToCloud();
+            return;
+          }
+          const data = snap.data();
+          applyingRemoteUpdate = true;
+          if (unsynced){
+            clients = mergeById(data.clients, clients);
+            payments = mergeById(data.payments, payments);
+            services = mergeById(data.services, services);
+            products = mergeById(data.products, products);
+          } else {
+            clients = data.clients || [];
+            payments = data.payments || [];
+            services = data.services || [];
+            products = data.products || [];
+          }
+          render();
+          applyingRemoteUpdate = false;
+          await persistLocal();
+          if (unsynced) pushToCloud();
+        }, (err) => {
+          console.error('Error de sincronización', err);
+          const denied = !!(err && err.code === 'permission-denied');
+          if (denied) setVerified('');
+          updateSyncBadge(denied ? 'denied' : 'error');
+        });
       });
     }catch(e){
       console.error('No se pudo iniciar la sincronización', e);
+      initFailed = true;
       updateSyncBadge('error');
     }
+  }
+
+  async function cloudSignIn(){
+    if (!cloudAuth){ showToast('La sincronización todavía no está lista'); return; }
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    try{
+      await signInWithPopup(cloudAuth, provider);
+    }catch(e){
+      if (e && (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment')){
+        try{ await signInWithRedirect(cloudAuth, provider); return; }catch(e2){ /* cae al aviso */ }
+      }
+      if (!e || (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request')){
+        console.error('No se pudo iniciar sesión', e);
+        showToast('No se pudo iniciar sesión. Intenta de nuevo.');
+      }
+    }
+  }
+
+  async function cloudSignOut(skipConfirm){
+    if (!cloudAuth) return;
+    if (!skipConfirm && !confirm('¿Cerrar sesión? Tendrás que volver a entrar con Google. Los datos seguirán guardados en este celular.')) return;
+    try{ await signOut(cloudAuth); }catch(e){ showToast('No se pudo cerrar sesión'); }
   }
 
   function showToast(msg){
@@ -1615,6 +1809,7 @@ let pendingLocalPush = false;
     renderProducts();
     renderLedger();
     renderReminders();
+    renderAccount();
   }
 
 
@@ -1975,6 +2170,11 @@ let pendingLocalPush = false;
   $('invoiceClose').addEventListener('click', () => $('invoiceOverlay').classList.remove('show'));
   $('invoiceOverlay').addEventListener('click', (e) => { if (e.target.id === 'invoiceOverlay') $('invoiceOverlay').classList.remove('show'); });
   $('saveClientBtn').addEventListener('click', saveClient);
+  $('signInBtn').addEventListener('click', cloudSignIn);
+  $('signOutBtn').addEventListener('click', () => cloudSignOut(false));
+  $('gateSignInBtn').addEventListener('click', cloudSignIn);
+  $('gateSignOutBtn').addEventListener('click', () => cloudSignOut(true));
+  $('syncBadge').addEventListener('click', () => { if (SYNC_ENABLED && !currentUser) cloudSignIn(); });
   $('pickContactsBtn').addEventListener('click', pickFromContacts);
   $('vcfInput').addEventListener('change', importVcf);
   $('savePayBtn').addEventListener('click', savePayment);
